@@ -18,6 +18,13 @@ To run:
 ./main SOME_BF_FILE
 ```
 
+## Lint
+
+To lint:
+```
+gofmt -w .
+```
+
 ## Test
 
 To test:
