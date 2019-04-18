@@ -33,11 +33,7 @@ func NewIncrementPtrExpr() *IncrementPtrExpr {
 }
 
 func (expr *IncrementPtrExpr) Execute(context *Context) error {
-	if context.Ptr == 255 {
-		context.Ptr = 0
-	} else {
-		context.Ptr++
-	}
+	context.Ptr++
 	return nil
 }
 
@@ -48,11 +44,7 @@ func NewDecrementPtrExpr() *DecrementPtrExpr {
 }
 
 func (expr *DecrementPtrExpr) Execute(context *Context) error {
-	if context.Ptr == 0 {
-		context.Ptr = 255
-	} else {
-		context.Ptr--
-	}
+	context.Ptr--
 	return nil
 }
 
@@ -63,11 +55,7 @@ func NewIncrementExpr() *IncrementExpr {
 }
 
 func (expr *IncrementExpr) Execute(context *Context) error {
-	if context.Mem[context.Ptr] == 255 {
-		context.Mem[context.Ptr] = 0
-	} else {
-		context.Mem[context.Ptr]++
-	}
+	context.Mem[context.Ptr]++
 	return nil
 }
 
@@ -78,11 +66,7 @@ func NewDecrementExpr() *DecrementExpr {
 }
 
 func (expr *DecrementExpr) Execute(context *Context) error {
-	if context.Mem[context.Ptr] == 0 {
-		context.Mem[context.Ptr] = 255
-	} else {
-		context.Mem[context.Ptr]--
-	}
+	context.Mem[context.Ptr]--
 	return nil
 }
 
