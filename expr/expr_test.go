@@ -158,6 +158,24 @@ func TestReadExpr(t *testing.T) {
 			t.Errorf("expected 42, got: %d", context.Mem[0])
 		}
 	})
+
+	t.Run("does nothing on EOF", func(t *testing.T) {
+		t.Parallel()
+
+		reader := bytes.NewReader([]byte{})
+
+		context := &Context{
+			Mem: []byte{0},
+			Ptr: 0,
+			In:  bufio.NewReader(reader),
+		}
+
+		NewReadExpr().Execute(context)
+
+		if context.Mem[0] != 0 {
+			t.Errorf("expected 0, got: %d", context.Mem[0])
+		}
+	})
 }
 
 func TestWriteExpr(t *testing.T) {

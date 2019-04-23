@@ -3,6 +3,7 @@ package expr
 import (
 	"bufio"
 	"fmt"
+	"io"
 )
 
 const MEMSIZE = 256
@@ -79,6 +80,9 @@ func NewReadExpr() *ReadExpr {
 
 func (expr *ReadExpr) Execute(context *Context) error {
 	inByte, err := context.In.ReadByte()
+	if err == io.EOF {
+		return nil
+	}
 	if err != nil {
 		return fmt.Errorf("failed to read from stdin: %s", err.Error())
 	}
