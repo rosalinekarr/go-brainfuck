@@ -127,6 +127,38 @@ func TestParse(t *testing.T) {
 		}
 	})
 
+	t.Run("returns ErrUnexpectedEOF on unclosed loops", func(t *testing.T) {
+		t.Parallel()
+
+		parser := &Parser{}
+		reader := bytes.NewReader([]byte("[[]"))
+		expected := expr.NewLoopExpr([]expr.Expr{
+			expr.NewLoopExpr(nil),
+		})
+
+		err := parser.Parse(reader)
+
+		if err != ErrUnexpectedEOF {
+			t.Errorf("expected %T, got: %v", expected, err)
+		}
+	})
+
+	t.Run("returns ErrUnexpectedEOF on unmatched loop closings", func(t *testing.T) {
+		t.Parallel()
+
+		parser := &Parser{}
+		reader := bytes.NewReader([]byte("[]]"))
+		expected := expr.NewLoopExpr([]expr.Expr{
+			expr.NewLoopExpr(nil),
+		})
+
+		err := parser.Parse(reader)
+
+		if err != ErrUnexpectedLoopClose {
+			t.Errorf("expected %T, got: %v", expected, err)
+		}
+	})
+
 	t.Run("ignores non-command characters", func(t *testing.T) {
 		t.Parallel()
 
