@@ -2,7 +2,6 @@ package parser
 
 import (
 	"bufio"
-	"bytes"
 	"context"
 	"io"
 
@@ -49,16 +48,13 @@ func parse(reader io.Reader) ([]expr.Expr, error) {
 		case ',':
 			expression = expr.NewReadExpr()
 		case '[':
-			substr, err := in.ReadBytes(']')
-			if err != nil {
-				return nil, err
-			}
-			byteReader := bytes.NewReader(substr)
-			ast, err := parse(byteReader)
+			ast, err := parse(in)
 			if err != nil {
 				return nil, err
 			}
 			expression = expr.NewLoopExpr(ast)
+		case ']':
+			return ast, nil
 		}
 		if expression != nil {
 			ast = append(ast, expression)

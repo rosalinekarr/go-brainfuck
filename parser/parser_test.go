@@ -111,6 +111,22 @@ func TestParse(t *testing.T) {
 		}
 	})
 
+	t.Run("successfully parses nested loops", func(t *testing.T) {
+		t.Parallel()
+
+		parser := &Parser{}
+		reader := bytes.NewReader([]byte("[[]]"))
+		expected := expr.NewLoopExpr([]expr.Expr{
+			expr.NewLoopExpr(nil),
+		})
+
+		parser.Parse(reader)
+
+		if reflect.DeepEqual(parser.ast[0], *expected) {
+			t.Errorf("expected %T, got: %T", expected, parser.ast[0])
+		}
+	})
+
 	t.Run("ignores non-command characters", func(t *testing.T) {
 		t.Parallel()
 
