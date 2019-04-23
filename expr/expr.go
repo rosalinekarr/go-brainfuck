@@ -2,6 +2,7 @@ package expr
 
 import (
 	"bufio"
+	"fmt"
 )
 
 const MEMSIZE = 256
@@ -79,7 +80,7 @@ func NewReadExpr() *ReadExpr {
 func (expr *ReadExpr) Execute(context *Context) error {
 	inByte, err := context.In.ReadByte()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read from stdin: %s", err.Error())
 	}
 	context.Mem[context.Ptr] = inByte
 	return nil
@@ -94,7 +95,10 @@ func NewWriteExpr() *WriteExpr {
 func (expr *WriteExpr) Execute(context *Context) error {
 	defer context.Out.Flush()
 	outByte := context.Mem[context.Ptr]
-	return context.Out.WriteByte(outByte)
+	if err := context.Out.WriteByte(outByte); err != nil {
+		return fmt.Errorf("failed to write to stdin: %s", err.Error())
+	}
+	return nil
 }
 
 type LoopExpr struct {
