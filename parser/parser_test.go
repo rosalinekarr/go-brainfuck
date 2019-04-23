@@ -2,7 +2,9 @@ package parser
 
 import (
 	"bytes"
+	"context"
 	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/rosalinekarr/go-brainfuck/expr"
@@ -127,18 +129,48 @@ func TestParse(t *testing.T) {
 func TestRun(t *testing.T) {
 	t.Parallel()
 
-	t.Run("prints \"Hello, world!\"", func(t *testing.T) {
+	t.Run("successfully prints \"Hello, world!\"", func(t *testing.T) {
 		t.Parallel()
+
+		ctx := context.Background()
 
 		parser := NewParser()
 		reader := bytes.NewReader([]byte("-[------->+<]>-.-[->+++++<]>++.+++++++..+++.[->+++++<]>+.------------.--[->++++<]>-.--------.+++.------.--------.-[--->+<]>."))
 
 		var out bytes.Buffer
 		parser.Parse(reader)
-		parser.Run(nil, &out)
+		err := parser.Run(ctx, nil, &out)
+
+		if err != nil {
+			t.Errorf("error: %s", err.Error())
+		}
 
 		if out.String() != "Hello, world!" {
 			t.Errorf("expected \"Hello, world!\", got: %s", out.String())
+		}
+	})
+
+	t.Run("cancels correctly", func(t *testing.T) {
+		t.Parallel()
+
+		ctx, cancel := context.WithCancel(context.Background())
+
+		parser := NewParser()
+		reader := bytes.NewReader([]byte("+[->+]"))
+		parser.Parse(reader)
+
+		var wg sync.WaitGroup
+		var err error
+		wg.Add(1)
+		go func() {
+			err = parser.Run(ctx, nil, nil)
+			wg.Done()
+		}()
+		cancel()
+		wg.Wait()
+
+		if err == nil || err.Error() != "context canceled" {
+			t.Errorf("expected context cancelled error, got: %v", err)
 		}
 	})
 }

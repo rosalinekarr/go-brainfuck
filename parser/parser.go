@@ -3,6 +3,7 @@ package parser
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"io"
 
 	"github.com/rosalinekarr/go-brainfuck/expr"
@@ -67,14 +68,19 @@ func parse(reader io.Reader) ([]expr.Expr, error) {
 	return ast, nil
 }
 
-func (parser *Parser) Run(reader io.Reader, writer io.Writer) error {
+func (parser *Parser) Run(ctx context.Context, reader io.Reader, writer io.Writer) error {
 	in := bufio.NewReader(reader)
 	out := bufio.NewWriter(writer)
 	context := expr.NewContext(in, out)
 	for _, expression := range parser.ast {
-		err := expression.Execute(context)
-		if err != nil {
-			return err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			err := expression.Execute(context)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"os"
 
 	"github.com/rosalinekarr/go-brainfuck/parser"
 )
 
 func main() {
+	ctx := context.Background()
+
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		panic(err)
@@ -17,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	if err = p.Run(os.Stdin, os.Stdout); err != nil {
+	if err = p.Run(ctx, os.Stdin, os.Stdout); err != nil {
 		panic(err)
 	}
 }
